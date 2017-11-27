@@ -162,7 +162,8 @@ def echo_three(host, ttl):
 # if len(sys.argv) <= 1:
 #     print('Bad usage. Provide a hostname.')
 #     sys.exit(1)
-dest_addr = "google.com"
+addr = input('Enter url: ')
+dest_addr = addr
 # Domain name to IP address conversion:
 host = socket.gethostbyname(dest_addr)
 timeout = 3
