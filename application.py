@@ -20,6 +20,8 @@ import sys;
 def cbc(id, tex):
     if id==1:
         return lambda: nslookup(id, tex)
+    if id == 2:
+        return lambda: trace(id , tex)
     if id==3:
         return lambda: readOldNslookup(id, tex)
     if id==4:
@@ -170,23 +172,23 @@ tex = tk.Text(master=top)
 tex.pack(side=tk.RIGHT)
 bop = tk.Frame()
 bop.pack(side=tk.LEFT)
-scanner = Entry(bop)
+v = StringVar()
+scanner = Entry(bop, textvariable=v)
 scanner.pack(padx=5)
 
 # if len(sys.argv) <= 1:
 #     print('Bad usage. Provide a hostname.')
 #     sys.exit(1)
 
-dest_addr = scanner.get()
-
 # Domain name to IP address conversion:
-host = socket.gethostbyname(dest_addr)
 timeout = 3
 max_tries = 30
 
-def run(s):
-    s += '\n    Welcome to Traceroute \n'
-    s += ('myTraceRoute to ' + dest_addr + ' (' + host + '), ' + str(max_tries) +
+def trace(id,tex):
+    dest_addr = scanner.get()
+    host = socket.gethostbyname(dest_addr)
+    s = '\n    Welcome to Traceroute \n'
+    s += ('myTraceRoute to ' + scanner.get() + ' (' + host + '), ' + str(max_tries) +
          ' hops max.\n')
 
     try:
@@ -239,6 +241,11 @@ def save(id,tex):
 k=1
 
 b = tk.Button(bop, text="nslookup", command=cbc(k,tex))
+b.pack()
+
+k=2
+
+b = tk.Button(bop, text="traceroute", command=cbc(k,tex))
 b.pack()
 
 k = 3
