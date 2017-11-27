@@ -169,7 +169,9 @@ def echo_three(host, ttl):
 
 top = tk.Tk()
 tex = tk.Text(master=top)
+textCompare = tk.Text(master=top)
 tex.pack(side=tk.RIGHT)
+textCompare.pack(side=tk.RIGHT)
 bop = tk.Frame()
 bop.pack(side=tk.LEFT)
 v = StringVar()
