@@ -24,8 +24,6 @@ def cbc(id, tex):
         return lambda: nslookup(id, tex)
     if id == 2:
         return lambda: trace(id , tex)
-    if id==3:
-        return lambda: readOldNslookup(id, tex)
     if id==4:
         return lambda: save(id, tex)
 
@@ -208,6 +206,7 @@ def trace(id,tex):
     except KeyboardInterrupt as err:
         print(err)
 
+    tex.delete("1.0",END)
     tex.insert(tk.END, s)
     tex.see(tk.END)
 
@@ -224,23 +223,25 @@ def nslookup(id,tex):
             s += ipa + ' ' + a[0] + '\n'
         except socket.herror:
             pass
+    tex.delete("1.0",END)
     tex.insert(tk.END, s)
     tex.see(tk.END)
 
 def compare():
     filename = askopenfilename()
-    print(filename)
-
-def readOldNslookup(id,tex):
-    file = open("save.txt", 'r')
+    file = open(filename, 'r')
     s = file.read()
+    tex.delete("1.0",END)
     tex.insert(tk.END, s)
     tex.see(tk.END)
     file.close()
 
 def save(id,tex):
     title = tex.get("1.0",END)
-    file = open("save.txt", 'w')
+    try:
+        file = open(saveFile.get()+".txt", 'x')
+    except:
+        file = open(saveFile.get() + ".txt", 'w')
     file.write(title)
     file.close()
 
@@ -254,10 +255,8 @@ k=2
 b = tk.Button(bop, text="traceroute", command=cbc(k,tex))
 b.pack()
 
-k = 3
-
-r = tk.Button(bop, text="readOldNslookup", command=cbc(k,tex))
-r.pack()
+saveFile = Entry(bop)
+saveFile.pack(padx=5)
 
 k = 4
 
