@@ -7,6 +7,7 @@
 # root.mainloop()
 # !/usr/bin/env python
 from tkinter import *
+from tkinter.filedialog import askopenfilename
 import tkinter as tk
 import socket;
 import struct;
@@ -15,6 +16,7 @@ import time;
 import select;
 import math;
 import sys;
+import os;
 
 
 def cbc(id, tex):
@@ -218,12 +220,17 @@ def nslookup(id,tex):
     tex.insert(tk.END, s)
     tex.see(tk.END)
 
-
+def compare():
+    filename = askopenfilename()
+    print(filename)
 
 k=1
 
 b = tk.Button(bop, text="nslookup", command=cbc(k,tex))
 b.pack()
+
+choose = tk.Button(bop, text="compare", command=compare)
+choose.pack()
 
 tk.Button(bop, text='Exit', command=top.destroy).pack()
 top.mainloop()
