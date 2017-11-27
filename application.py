@@ -6,6 +6,7 @@
 # Label(root, text="Hello, Tkinter").pack()
 # root.mainloop()
 # !/usr/bin/env python
+from tkinter import *
 import tkinter as tk
 import socket;
 import struct;
@@ -17,7 +18,7 @@ import sys;
 
 
 def cbc(id, tex):
-    return lambda: callback(id, tex)
+    return lambda: nslookup(id, tex)
 
 
 def callback(id, tex):
@@ -159,10 +160,18 @@ def echo_three(host, ttl):
 # Main execution starts here #
 # -------------------------- #
 
+top = tk.Tk()
+tex = tk.Text(master=top)
+tex.pack(side=tk.RIGHT)
+bop = tk.Frame()
+bop.pack(side=tk.LEFT)
+scanner = Entry(bop)
+scanner.pack(padx=5)
+
 # if len(sys.argv) <= 1:
 #     print('Bad usage. Provide a hostname.')
 #     sys.exit(1)
-dest_addr = "google.com"
+dest_addr = scanner.get()
 # Domain name to IP address conversion:
 host = socket.gethostbyname(dest_addr)
 timeout = 3
@@ -191,10 +200,10 @@ def run(s):
     tex.insert(tk.END, s)
     tex.see(tk.END)
 
-def nslookup():
+def nslookup(id,tex):
     s = '   Welcome to nslookup \n'
     for i in range(0, 255):
-        addr1 = socket.gethostbyname('ku.ac.th')
+        addr1 = socket.gethostbyname(scanner.get())
         data = addr1.split('.')
         addr = data[0] + "." + data[1] + "." + data[2] + "."
 
@@ -204,17 +213,14 @@ def nslookup():
             s += ipa + ' ' + a[0] + '\n'
         except socket.herror:
             pass
-    run(s)
+    tex.insert(tk.END, s)
+    tex.see(tk.END)
 
-top = tk.Tk()
-tex = tk.Text(master=top)
-tex.pack(side=tk.RIGHT)
-bop = tk.Frame()
-bop.pack(side=tk.LEFT)
+
 
 k=1
-tv = 'Say {}'.format(k)
-b = tk.Button(bop, text=tv, command=nslookup())
+
+b = tk.Button(bop, text="nslookup", command=cbc(k,tex))
 b.pack()
 
 tk.Button(bop, text='Exit', command=top.destroy).pack()
