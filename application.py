@@ -20,7 +20,14 @@ import os;
 
 
 def cbc(id, tex):
-    return lambda: nslookup(id, tex)
+    if id==1:
+        return lambda: nslookup(id, tex)
+    if id == 2:
+        return lambda: trace(id , tex)
+    if id==3:
+        return lambda: readOldNslookup(id, tex)
+    if id==4:
+        return lambda: save(id, tex)
 
 
 def callback(id, tex):
@@ -167,23 +174,23 @@ tex = tk.Text(master=top)
 tex.pack(side=tk.RIGHT)
 bop = tk.Frame()
 bop.pack(side=tk.LEFT)
-scanner = Entry(bop)
+v = StringVar()
+scanner = Entry(bop, textvariable=v)
 scanner.pack(padx=5)
 
 # if len(sys.argv) <= 1:
 #     print('Bad usage. Provide a hostname.')
 #     sys.exit(1)
 
-dest_addr = scanner.get()
-
 # Domain name to IP address conversion:
-host = socket.gethostbyname(dest_addr)
 timeout = 3
 max_tries = 30
 
-def run(s):
-    s += '\n    Welcome to Traceroute \n'
-    s += ('myTraceRoute to ' + dest_addr + ' (' + host + '), ' + str(max_tries) +
+def trace(id,tex):
+    dest_addr = scanner.get()
+    host = socket.gethostbyname(dest_addr)
+    s = '\n    Welcome to Traceroute \n'
+    s += ('myTraceRoute to ' + scanner.get() + ' (' + host + '), ' + str(max_tries) +
          ' hops max.\n')
 
     try:
@@ -224,10 +231,38 @@ def compare():
     filename = askopenfilename()
     print(filename)
 
+def readOldNslookup(id,tex):
+    file = open("save.txt", 'r')
+    s = file.read()
+    tex.insert(tk.END, s)
+    tex.see(tk.END)
+    file.close()
+
+def save(id,tex):
+    title = tex.get("1.0",END)
+    file = open("save.txt", 'w')
+    file.write(title)
+    file.close()
+
 k=1
 
 b = tk.Button(bop, text="nslookup", command=cbc(k,tex))
 b.pack()
+
+k=2
+
+b = tk.Button(bop, text="traceroute", command=cbc(k,tex))
+b.pack()
+
+k = 3
+
+r = tk.Button(bop, text="readOldNslookup", command=cbc(k,tex))
+r.pack()
+
+k = 4
+
+r = tk.Button(bop, text="saveData", command=cbc(k,tex))
+r.pack()
 
 choose = tk.Button(bop, text="compare", command=compare)
 choose.pack()
