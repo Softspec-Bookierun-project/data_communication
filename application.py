@@ -7,7 +7,7 @@
 # root.mainloop()
 # !/usr/bin/env python
 from tkinter import *
-from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import *
 import tkinter as tk
 import socket;
 import struct;
@@ -239,13 +239,12 @@ def compare():
     file.close()
 
 def save(id,tex):
-    title = tex.get("1.0",END)
-    try:
-        file = open(saveFile.get()+".txt", 'x')
-    except:
-        file = open(saveFile.get() + ".txt", 'w')
-    file.write(title)
-    file.close()
+    f = asksaveasfile(mode='w', defaultextension=".txt")
+    if f is None: # asksaveasfile return `None` if dialog closed with "cancel".
+        return
+    text2save = tex.get("1.0", END) # starts from `1.0`, not `0.0`
+    f.write(text2save)
+    f.close() # `()` was missing.
 
 k=1
 
@@ -256,9 +255,6 @@ k=2
 
 b = tk.Button(bop, text="traceroute", command=cbc(k,tex))
 b.pack()
-
-saveFile = Entry(bop)
-saveFile.pack(padx=5)
 
 k = 4
 
