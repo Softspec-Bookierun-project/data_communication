@@ -233,9 +233,10 @@ def compare():
     filename = askopenfilename()
     file = open(filename, 'r')
     s = file.read()
-    tex.delete("1.0",END)
-    tex.insert(tk.END, s)
-    tex.see(tk.END)
+    s = "Compare :\n" + s
+    textCompare.delete("1.0",END)
+    textCompare.insert(tk.END, s)
+    textCompare.see(tk.END)
     file.close()
 
 def save(id,tex):
