@@ -171,7 +171,9 @@ scanner.pack(padx=5)
 # if len(sys.argv) <= 1:
 #     print('Bad usage. Provide a hostname.')
 #     sys.exit(1)
+
 dest_addr = scanner.get()
+
 # Domain name to IP address conversion:
 host = socket.gethostbyname(dest_addr)
 timeout = 3
