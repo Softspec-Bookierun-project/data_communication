@@ -18,10 +18,14 @@ import sys;
 
 
 def cbc(id, tex):
-    if id == 1:
+    if id==1:
         return lambda: nslookup(id, tex)
     if id == 2:
         return lambda: trace(id , tex)
+    if id==3:
+        return lambda: readOldNslookup(id, tex)
+    if id==4:
+        return lambda: save(id, tex)
 
 
 def callback(id, tex):
@@ -221,7 +225,18 @@ def nslookup(id,tex):
     tex.insert(tk.END, s)
     tex.see(tk.END)
 
+def readOldNslookup(id,tex):
+    file = open("save.txt", 'r')
+    s = file.read()
+    tex.insert(tk.END, s)
+    tex.see(tk.END)
+    file.close()
 
+def save(id,tex):
+    title = tex.get("1.0",END)
+    file = open("save.txt", 'w')
+    file.write(title)
+    file.close()
 
 k=1
 
@@ -232,6 +247,16 @@ k=2
 
 b = tk.Button(bop, text="traceroute", command=cbc(k,tex))
 b.pack()
+
+k = 3
+
+r = tk.Button(bop, text="readOldNslookup", command=cbc(k,tex))
+r.pack()
+
+k = 4
+
+r = tk.Button(bop, text="saveData", command=cbc(k,tex))
+r.pack()
 
 tk.Button(bop, text='Exit', command=top.destroy).pack()
 top.mainloop()
