@@ -10,17 +10,54 @@ import math;
 import sys;
 import os;
 
+def create_packet(id):
+    header = struct.pack('bbHHh', ICMP_ECHO_REQUEST, 0, 0, id, 1)
+    data = ''
+    my_checksum = checksum(header + data.encode('utf-8'))
+    header = struct.pack('bbHHh', ICMP_ECHO_REQUEST, 0,
+            socket.htons(my_checksum), id, 1)
+    return header + data.encode('utf-8')
 
-def cbc(id, tex):
-    if id==1:
-        return lambda: nslookup(id, tex)
-    if id == 2:
-        return lambda: trace(id , tex)
-    if id==4:
-        return lambda: save(id, tex)
+def echo_one(host, ttl):
+    my_socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, ICMP_CODE)
+    my_socket.setsockopt(socket.SOL_IP, socket.IP_TTL, ttl)
+    packet_id = int(random.random() * 65535)
+    packet = create_packet(packet_id)
+    while packet:
+        sent = my_socket.sendto(packet, (host, 1))
+        packet = packet[sent:]
 
-ICMP_ECHO_REQUEST = 8
-ICMP_CODE = socket.getprotobyname('icmp');
+    ping_res = receive_ping(my_socket, packet_id, time.time(), timeout)
+    my_socket.close()
+    return ping_res
+
+def echo_three(host, ttl):
+    ping1 = echo_one(host, ttl)
+    ping2 = echo_one(host, ttl)
+    ping3 = echo_one(host, ttl)
+
+    if ping1 == 0:
+        ping1str = '*'
+    else:
+        ping1str = ping1[0] + ' - ' + str(ping1[1]) + ' ms'
+    if ping2 == 0:
+        ping2str = '*'
+    else:
+        ping2str = ping2[0] + ' - ' + str(ping2[1]) + ' ms'
+    if ping3 == 0:
+        ping3str = '*'
+    else:
+        ping3str = ping3[0] + ' - ' + str(ping3[1]) + ' ms'
+
+    merge_string = ping1str + ', ' + ping2str + ', ' + ping3str
+    merge_string = str(ttl) + '  ' + merge_string
+
+    if ping1 == 0:
+        destination_reached = False
+    else:
+        destination_reached = ping1[0] == host
+
+    return (merge_string, destination_reached)
 
 def checksum(source_string):
     sum = 0
@@ -40,14 +77,6 @@ def checksum(source_string):
     answer = answer & 0xffff
     answer = answer >> 8 | (answer << 8 & 0xff00)
     return answer
-
-def create_packet(id):
-    header = struct.pack('bbHHh', ICMP_ECHO_REQUEST, 0, 0, id, 1)
-    data = ''
-    my_checksum = checksum(header + data.encode('utf-8'))
-    header = struct.pack('bbHHh', ICMP_ECHO_REQUEST, 0,
-            socket.htons(my_checksum), id, 1)
-    return header + data.encode('utf-8')
 
 def receive_ping(my_socket, packet_id, time_sent, timeout):
     time_left = timeout
@@ -70,46 +99,16 @@ def receive_ping(my_socket, packet_id, time_sent, timeout):
         if time_left <= 0:
             return 0
 
-def echo_one(host, ttl):
-    my_socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, ICMP_CODE)
-    my_socket.setsockopt(socket.SOL_IP, socket.IP_TTL, ttl)
-    packet_id = int(random.random() * 65535)
-    packet = create_packet(packet_id)
-    while packet:
-        sent = my_socket.sendto(packet, (host, 1))
-        packet = packet[sent:]
+def cbc(id, tex):
+    if id==1:
+        return lambda: nslookup(id, tex)
+    if id == 2:
+        return lambda: trace(id , tex)
+    if id==4:
+        return lambda: save(id, tex)
 
-    ping_res = receive_ping(my_socket, packet_id, time.time(), timeout)
-    my_socket.close()
-    return ping_res
-
-def echo_three(host, ttl):
-    try1 = echo_one(host, ttl)
-    try2 = echo_one(host, ttl)
-    try3 = echo_one(host, ttl)
-
-    if try1 == 0:
-        try1str = '*'
-    else:
-        try1str = try1[0] + ' - ' + str(try1[1]) + ' ms'
-    if try2 == 0:
-        try2str = '*'
-    else:
-        try2str = try2[0] + ' - ' + str(try2[1]) + ' ms'
-    if try3 == 0:
-        try3str = '*'
-    else:
-        try3str = try3[0] + ' - ' + str(try3[1]) + ' ms'
-
-    final_string = try1str + ', ' + try2str + ', ' + try3str
-    final_string = str(ttl) + '  ' + final_string
-
-    if try1 == 0:
-        destination_reached = False
-    else:
-        destination_reached = try1[0] == host
-
-    return (final_string, destination_reached)
+ICMP_ECHO_REQUEST = 8
+ICMP_CODE = socket.getprotobyname('icmp');
 
 top = tk.Tk()
 top.title("Datacom")
